@@ -2,7 +2,7 @@
   "name": "Baby Cry",
   "data": {
     "type": "FolderDataManager",
-    "path": "/home/kiran/Documents/DATA/UrbanSound8K",
+    "path": "BabyCry",
     "format": "audio",
     "loader": {
       "shuffle": true,

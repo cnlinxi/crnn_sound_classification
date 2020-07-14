@@ -10,7 +10,6 @@ from utils.util import list_dir, load_image, load_audio
 
 
 class FolderDataManager(object):
-
     def __init__(self, config):
         load_formats = {
             'image': load_image,
@@ -190,8 +189,9 @@ class CSVDataManager(object):
 
 
 if __name__ == '__main__':
-    import json
-
-    d = json.load(open('../config.json'))
-    print(d)
-    print(sum(list(d['data']['splits'].values())))
+    pass
+    # import json
+    #
+    # d = json.load(open('../config.json'))
+    # print(d)
+    # print(sum(list(d['data']['splits'].values())))

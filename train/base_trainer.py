@@ -8,11 +8,13 @@ import pandas as pd
 from utils.util import mkdir_p
 from utils.visualization import WriterTensorboardX
 
+
 # Structure based off https://github.com/victoresque/pytorch-template
 class BaseTrainer:
     """
     Base class for all trainers
     """
+
     def __init__(self, model, loss, metrics, optimizer, resume, config, train_logger=None):
         self.config = config
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -42,11 +44,12 @@ class BaseTrainer:
 
             self.mnt_best = math.inf if self.mnt_mode == 'min' else -math.inf
             self.early_stop = cfg_trainer.get('early_stop', math.inf)
-        
+
         self.start_epoch = 1
 
         # setup directory for checkpoint saving
         start_time = datetime.datetime.now().strftime('%m%d_%H%M%S')
+        os.makedirs(cfg_trainer['save_dir'], exist_ok=True)
         self.checkpoint_dir = os.path.join(cfg_trainer['save_dir'], start_time, 'checkpoints')
         self.log_dir = os.path.join(cfg_trainer['save_dir'], start_time, 'logs')
 
@@ -54,13 +57,12 @@ class BaseTrainer:
 
         # Save configuration file into checkpoint directory:
         mkdir_p(self.checkpoint_dir)
-        
+
         if self.config.get('cfg', None) is not None:
             cfg_save_path = os.path.join(self.checkpoint_dir, 'model.cfg')
             with open(cfg_save_path, 'w') as fw:
                 fw.write(open(self.config['cfg']).read())
             self.config['cfg'] = cfg_save_path
-
 
         config_save_path = os.path.join(self.checkpoint_dir, 'config.json')
         with open(config_save_path, 'w') as handle:
@@ -68,7 +70,6 @@ class BaseTrainer:
 
         if resume:
             self._resume_checkpoint(resume)
-    
 
     def train(self):
         """
@@ -77,12 +78,10 @@ class BaseTrainer:
         best_df = None
         not_improved_count = 0
 
-
-        #f = open(os.path.join(self.log_dir, 'lr.txt'), 'w')
-
+        # f = open(os.path.join(self.log_dir, 'lr.txt'), 'w')
 
         for epoch in range(self.start_epoch, self.epochs + 1):
-            
+
             # _train_epoch returns dict with train metrics ("metrics"), validation
             # metrics ("val_metrics") and other key,value pairs. Store/update them in log.
             result = self._train_epoch(epoch)
@@ -91,28 +90,26 @@ class BaseTrainer:
             log = {'epoch': epoch}
             for key, value in result.items():
                 if key == 'metrics':
-                    log.update({mtr.__name__ : value[i] for i, mtr in enumerate(self.metrics)})
+                    log.update({mtr.__name__: value[i] for i, mtr in enumerate(self.metrics)})
                 elif key == 'val_metrics':
-                    log.update({'val_' + mtr.__name__ : value[i] for i, mtr in enumerate(self.metrics)})
+                    log.update({'val_' + mtr.__name__: value[i] for i, mtr in enumerate(self.metrics)})
                 else:
                     log[key] = value
 
             c_lr = self.optimizer.param_groups[0]['lr']
-            
+
             # print logged informations to the screen
             if self.train_logger is not None:
                 self.train_logger.add_entry(log)
                 if self.verbosity >= 1:
-
                     df = pd.DataFrame.from_dict([log]).T
                     df.columns = ['']
-                    #self.logger.info('Epoch: {}'.format(epoch))
-                    self.logger.info('{}'.format(df.loc[df.index!='epoch']))
-                    self.logger.info('lr_0: {}'.format(c_lr) )
-                    
+                    # self.logger.info('Epoch: {}'.format(epoch))
+                    self.logger.info('{}'.format(df.loc[df.index != 'epoch']))
+                    self.logger.info('lr_0: {}'.format(c_lr))
 
-            #f.write('%.5f\t%.5f\t%.5f\n'%(c_lr, result['loss'], result['metrics'][0]))
-            #f.flush()
+            # f.write('%.5f\t%.5f\t%.5f\n'%(c_lr, result['loss'], result['metrics'][0]))
+            # f.flush()
             self.writer.add_scalar('lr', c_lr)
 
             # evaluate model performance according to configured metric, save best checkpoint as model_best
@@ -123,7 +120,9 @@ class BaseTrainer:
                     improved = (self.mnt_mode == 'min' and log[self.mnt_metric] < self.mnt_best) or \
                                (self.mnt_mode == 'max' and log[self.mnt_metric] > self.mnt_best)
                 except KeyError:
-                    self.logger.warning("Warning: Metric '{}' is not found. Model performance monitoring is disabled.".format(self.mnt_metric))
+                    self.logger.warning(
+                        "Warning: Metric '{}' is not found. Model performance monitoring is disabled.".format(
+                            self.mnt_metric))
                     self.mnt_mode = 'off'
                     improved = False
                     not_improved_count = 0
@@ -137,18 +136,19 @@ class BaseTrainer:
                     not_improved_count += 1
 
                 if not_improved_count > self.early_stop:
-                    self.logger.info("Validation performance didn\'t improve for {} epochs. Training stops.".format(self.early_stop))
-                    self.logger.info('Final:\n{}'.format(best_df.loc[best_df.index!='epoch']))
+                    self.logger.info(
+                        "Validation performance didn\'t improve for {} epochs. Training stops.".format(self.early_stop))
+                    self.logger.info('Final:\n{}'.format(best_df.loc[best_df.index != 'epoch']))
                     break
 
             if len(self.writer) > 0:
                 self.logger.info(
                     '\nRun TensorboardX:\ntensorboard --logdir={}\n'.format(self.log_dir))
-            
+
             if epoch % self.save_period == 0:
                 self._save_checkpoint(epoch, save_best=best)
-                #self.logger.info('\n\n\tTensorboardX Path: {}\n'.format(self.log_dir))
-            
+                # self.logger.info('\n\n\tTensorboardX Path: {}\n'.format(self.log_dir))
+
     def _train_epoch(self, epoch):
         """
         Training logic for an epoch
@@ -174,11 +174,11 @@ class BaseTrainer:
             'optimizer': self.optimizer.state_dict(),
             'monitor_best': self.mnt_best,
             'config': self.config,
-            'classes':self.model.classes
+            'classes': self.model.classes
         }
 
         filename = os.path.join(self.checkpoint_dir, 'checkpoint-current.pth')
-        #filename = os.path.join(self.checkpoint_dir, 'checkpoint-epoch{}.pth'.format(epoch))
+        # filename = os.path.join(self.checkpoint_dir, 'checkpoint-epoch{}.pth'.format(epoch))
         torch.save(state, filename)
         self.logger.info("Saving checkpoint: {} ...".format(filename))
         if save_best:
@@ -207,5 +207,3 @@ class BaseTrainer:
 
         self.train_logger = checkpoint['logger']
         self.logger.info("Checkpoint '{}' (epoch {}) loaded".format(resume_path, self.start_epoch))
-
-        
