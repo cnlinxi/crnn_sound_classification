@@ -12,7 +12,6 @@ from utils.util import list_dir, load_image, load_audio
 class FolderDataManager(object):
 
     def __init__(self, config):
-
         load_formats = {
             'image': load_image,
             'audio': load_audio
@@ -42,8 +41,8 @@ class FolderDataManager(object):
     def _get_splits(self, arr):
         '''
         "splits"    :   {
-                    "train" : [1,2,3,4,5,6,7,8,9],
-                    "val"   : [10]
+                    "train" : 0.9,
+                    "val"   : 0.1
                 }
         :param arr: [{'path': '1.jpg'(path), 'class': 'awake', 'class_idx': class_idx},
         {'path': '2.jpg'(path), 'class': 'awake', 'class_idx': class_idx},...]
@@ -191,4 +190,8 @@ class CSVDataManager(object):
 
 
 if __name__ == '__main__':
-    pass
+    import json
+
+    d = json.load(open('../config.json'))
+    print(d)
+    print(sum(list(d['data']['splits'].values())))
