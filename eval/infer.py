@@ -58,7 +58,7 @@ class AudioInference:
 
     def draw(self, path, label, conf):
         sig, sr = load_audio(path)
-        sig = torch.tensor(sig).mean(dim=1).view(1, 1, -1).float()
+        sig = torch.tensor(sig).view(1, 1, -1).float()
         spec = self.mel(sig)[0]
         out_path = '{}_pred.png'.format(os.path.basename(path).split('.')[0])
         pred_txt = "%s (%.1f%%)" % (label, 100 * conf)
