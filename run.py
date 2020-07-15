@@ -134,45 +134,50 @@ def _test_loader(config):
 
 
 if __name__ == '__main__':
-    argparser = argparse.ArgumentParser(description='PyTorch Template')
+    # argparser = argparse.ArgumentParser(description='PyTorch Template')
+    #
+    # argparser.add_argument('action', type=str,
+    #                        help='what action to take (train, test, eval)')
+    #
+    # argparser.add_argument('-c', '--config', default=None, type=str,
+    #                        help='config file path (default: None)')
+    # argparser.add_argument('-r', '--resume', default=None, type=str,
+    #                        help='path to latest checkpoint (default: None)')
+    # argparser.add_argument('--net_mode', default='init', type=str,
+    #                        help='type of transfer learning to use')
+    #
+    # argparser.add_argument('--cfg', default=None, type=str,
+    #                        help='nn layer config file')
+    #
+    # args = argparser.parse_args()
+    #
+    # # Resolve config vs. resume
+    # checkpoint = None
+    # if args.config:
+    #     config = json.load(open(args.config))
+    #     config['net_mode'] = args.net_mode
+    #     config['cfg'] = args.cfg
+    # elif args.resume:
+    #     checkpoint = torch.load(args.resume)
+    #     config = checkpoint['config']
+    # else:
+    #     raise AssertionError("Configuration file need to be specified. Add '-c config.json', for example.")
+    #
+    # # Pick mode to run
+    # if args.action == 'train':
+    #     train_main(config, args.resume)
+    #
+    # elif args.action == 'eval':
+    #     eval_main(checkpoint)
+    #
+    # elif args.action == 'testloader':
+    #     _test_loader(config)
+    #
+    # elif os.path.isfile(args.action):
+    #     file_path = args.action
+    #     infer_main(file_path, config, checkpoint)
 
-    argparser.add_argument('action', type=str,
-                           help='what action to take (train, test, eval)')
-
-    argparser.add_argument('-c', '--config', default=None, type=str,
-                           help='config file path (default: None)')
-    argparser.add_argument('-r', '--resume', default=None, type=str,
-                           help='path to latest checkpoint (default: None)')
-    argparser.add_argument('--net_mode', default='init', type=str,
-                           help='type of transfer learning to use')
-
-    argparser.add_argument('--cfg', default=None, type=str,
-                           help='nn layer config file')
-
-    args = argparser.parse_args()
-
-    # Resolve config vs. resume
-    checkpoint = None
-    if args.config:
-        config = json.load(open(args.config))
-        config['net_mode'] = args.net_mode
-        config['cfg'] = args.cfg
-    elif args.resume:
-        checkpoint = torch.load(args.resume)
-        config = checkpoint['config']
-    else:
-        raise AssertionError("Configuration file need to be specified. Add '-c config.json', for example.")
-
-    # Pick mode to run
-    if args.action == 'train':
-        train_main(config, args.resume)
-
-    elif args.action == 'eval':
-        eval_main(checkpoint)
-
-    elif args.action == 'testloader':
-        _test_loader(config)
-
-    elif os.path.isfile(args.action):
-        file_path = args.action
-        infer_main(file_path, config, checkpoint)
+    config = json.load(open('config.json'))
+    config['net_mode'] = 'init'
+    config['cfg'] = 'crnn.cfg'
+    train_main(config, None)

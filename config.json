@@ -2,7 +2,7 @@
   "name": "Baby Cry",
   "data": {
     "type": "FolderDataManager",
-    "path": "BabyCry",
+    "path": "BabyCry/train",
     "format": "audio",
     "loader": {
       "shuffle": true,

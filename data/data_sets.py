@@ -11,7 +11,6 @@ import torch.utils.data as data
 
 
 class FolderDataset(data.Dataset):
-
     def __init__(self, data_arr, load_func, transforms=None):
         self.transforms = transforms
         self.data_arr = data_arr
