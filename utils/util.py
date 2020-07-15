@@ -3,6 +3,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
 import soundfile as sf
+import librosa
 from matplotlib.ticker import LogLocator
 from matplotlib.colors import LogNorm
 from matplotlib import cm
@@ -52,7 +53,7 @@ def load_image(path):
 
 
 def load_audio(path):
-    return sf.read(path)
+    return librosa.load(path)
 
 
 def plot_heatmap(arr, fname, pred=''):
