@@ -51,6 +51,7 @@ def eval_main(checkpoint):
 
 
 def infer_main(file_path, config, checkpoint):
+    print('infer:', file_path)
     # Fix bugs
     if checkpoint is None:
         model = getattr(net_module, config['model']['type'])()
